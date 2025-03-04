@@ -27,11 +27,11 @@
     ]
   },
   "name": {
-    "en": "kintone-plugin-template",
-    "ja": "kintone-plugin-template"
+    "en": "ManagementConsole-apps",
+    "ja": "ManagementConsole-apps"
   },
   "description": {
-    "en": "kintone-plugin-template",
-    "ja": "kintone-plugin-template"
+    "en": "This plugin gets the list of apps.",
+    "ja": "アプリ一覧情報を取得するプラグインです"
   }
 }
