@@ -1,4 +1,4 @@
-# kintone-plugin-template
+# kintone-ms-apps
 
 ## 初回のセットアップ
 

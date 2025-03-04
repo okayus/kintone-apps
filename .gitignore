@@ -1,4 +1,5 @@
 node_modules
+private.prod.ppk
 private.ppk
 jsdoc
 dist
