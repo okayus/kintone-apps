@@ -1,18 +1,29 @@
 {
   "type": "object",
   "properties": {
-    "prefix": {
-      "type": "string",
-      "title": "通知メッセージのプレフィックス"
-    },
-    "fields": {
-      "type": "array",
-      "description": "メッセージに表示するフィールド",
-      "items": {
-        "type": "string"
-      }
+    "mappedGetAppsResponse": {
+      "type": "object",
+      "properties": {
+        "appId": { "type": "string" },
+        "code": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "spaceId": { "type": "string" },
+        "threadId": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "creator_code": { "type": "string" },
+        "creator_name": { "type": "string" },
+        "modifiedAt": { "type": "string" },
+        "modifier_code": { "type": "string" },
+        "modifier_name": { "type": "string" }
+      },
+      "required": [
+        "appId",
+        "code",
+        "name"
+      ]
     }
   },
-  "required": ["prefix", "fields"],
+  "required": ["mappedGetAppsResponse"],
   "additionalProperties": false
 }

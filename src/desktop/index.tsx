@@ -6,7 +6,7 @@ import { KintoneRestAPIClient } from "@kintone/rest-api-client";
 import { KintoneSdk } from "../shared/util/kintoneSdk";
 
 import IndexShowButton from "./components/IndexShowButton";
-import { MessageService } from "./service/MessageService";
+import { ManagementConsoleService } from "./service/ManagementConsoleService";
 
 import type { ConfigSchema } from "../shared/types/Config";
 import type { Record } from "@kintone/rest-api-client/lib/src/client/types";
@@ -37,7 +37,10 @@ interface KintoneEvent {
     const config: ConfigSchema = JSON.parse(pluginConfig).config;
     const restApiClient = new KintoneRestAPIClient();
     const kintoneSdk = new KintoneSdk(restApiClient);
-    const messageService = new MessageService(config, kintoneSdk);
+    const managementConsoleService = new ManagementConsoleService(
+      config,
+      kintoneSdk,
+    );
 
     const headerMenuSpace = kintone.app.getHeaderMenuSpaceElement();
     if (!headerMenuSpace) return;
@@ -48,11 +51,10 @@ interface KintoneEvent {
     renderButton(
       container,
       async () => {
-        const records = await messageService.fetchRecords(event.appId);
-
-        if (records.length > 0) {
-          messageService.alertMessage(records as Record[]);
-        }
+        const records = await managementConsoleService.upsertAppList(
+          event.appId,
+        );
+        alert(`レコードを更新しました: ${records.length}件`);
       },
       `[${event.viewName}]のレコードを表示`,
     );

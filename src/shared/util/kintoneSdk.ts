@@ -6,7 +6,16 @@ import {
 import type {
   AppID,
   Record,
+  RecordID,
+  Revision,
+  UpdateKey,
 } from "@kintone/rest-api-client/lib/src/client/types";
+
+export type RecordForParameter = {
+  [fieldCode: string]: {
+    value: unknown;
+  };
+};
 
 export class KintoneSdk {
   private restApiClient: KintoneRestAPIClient;
@@ -79,10 +88,23 @@ export class KintoneSdk {
 
   public async updateAllRecords(
     appId: AppID,
-    records: Array<{ id: string; record: Record }>,
+    upsert: boolean,
+    records: Array<
+      | {
+          id: RecordID;
+          record?: RecordForParameter;
+          revision?: Revision;
+        }
+      | {
+          updateKey: UpdateKey;
+          record?: RecordForParameter;
+          revision?: Revision;
+        }
+    >,
   ) {
     const res = await this.restApiClient.record.updateAllRecords({
       app: appId,
+      upsert,
       records,
     });
     return res;
