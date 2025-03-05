@@ -13,6 +13,7 @@ import type {
   App,
   AppID,
   Properties,
+  Record,
   RecordID,
   Revision,
   UpdateKey,
@@ -49,6 +50,8 @@ describe("MessageService", () => {
     mockkintoneSdk.getApps = vi.fn();
     mockkintoneSdk.updateAllRecords = vi.fn();
     mockkintoneSdk.getFormFields = vi.fn();
+    mockkintoneSdk.getRecords = vi.fn();
+    mockkintoneSdk.addFormFields = vi.fn();
   });
 
   describe("makeRecordsForUpdate", () => {
@@ -631,6 +634,72 @@ describe("MessageService", () => {
             },
           },
         ],
+      });
+    });
+  });
+
+  describe("addFormFieldsFromRecords", () => {
+    it("should add form fields from records", async () => {
+      const mockConfig: ConfigSchema = {
+        FormFieldListApp: {
+          appId: "2",
+        },
+        mappedGetFormFieldsResponse: {
+          appId: "appId",
+          primaryKey: "primaryKey",
+          fieldCode: "fieldCode",
+          label: "label",
+          type: "type",
+        },
+      } as ConfigSchema;
+
+      const managementConsoleService = new ManagementConsoleService(
+        mockConfig,
+        mockkintoneSdk,
+      );
+
+      const mockRecordList: Record[] = [
+        {
+          type: {
+            type: "SINGLE_LINE_TEXT",
+            value: "SINGLE_LINE_TEXT",
+          },
+          fieldCode1: {
+            type: "SINGLE_LINE_TEXT",
+            value: "Field Label 1",
+          },
+          fieldCode: {
+            type: "SINGLE_LINE_TEXT",
+            value: "fieldCode1",
+          },
+          label: {
+            type: "SINGLE_LINE_TEXT",
+            value: "Field Label 1",
+          },
+        } as Record,
+      ];
+
+      const mockRecords = {
+        records: mockRecordList,
+      };
+
+      mockkintoneSdk.getRecords.mockResolvedValue(mockRecords);
+
+      await managementConsoleService.addFormFieldsFromRecords();
+
+      expect(mockkintoneSdk.getRecords).toHaveBeenCalledWith({
+        appId: "2",
+      });
+
+      expect(mockkintoneSdk.addFormFields).toHaveBeenCalledWith({
+        appId: "2",
+        fields: {
+          fieldCode1: {
+            type: "SINGLE_LINE_TEXT",
+            code: "fieldCode1",
+            label: "Field Label 1",
+          },
+        },
       });
     });
   });

@@ -1,5 +1,6 @@
 import {
   KintoneSdk,
+  type PropertiesForParameter,
   type RecordForParameter,
 } from "../../shared/util/kintoneSdk";
 
@@ -139,5 +140,34 @@ export class ManagementConsoleService {
     });
 
     return recordsForUpdate;
+  }
+
+  public async addFormFieldsFromRecords(): Promise<void> {
+    const records = await this.kintoneSdk.getRecords({
+      appId: this.config.FormFieldListApp.appId,
+    });
+
+    const fields: PropertiesForParameter = {};
+
+    records.records.forEach((record) => {
+      if (record.type.value === "SINGLE_LINE_TEXT") {
+        fields[
+          record[this.config.mappedGetFormFieldsResponse.fieldCode]
+            .value as string
+        ] = {
+          type: "SINGLE_LINE_TEXT",
+          code: record[this.config.mappedGetFormFieldsResponse.fieldCode]
+            .value as string,
+          label: record[this.config.mappedGetFormFieldsResponse.label]
+            .value as string,
+        };
+      }
+      // 他のフィールドタイプの処理もここに追加できます
+    });
+
+    await this.kintoneSdk.addFormFields({
+      appId: this.config.FormFieldListApp.appId,
+      fields,
+    });
   }
 }

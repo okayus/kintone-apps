@@ -5,6 +5,7 @@ import {
 
 import type {
   AppID,
+  Properties,
   Record,
   RecordID,
   Revision,
@@ -16,6 +17,14 @@ export type RecordForParameter = {
     value: unknown;
   };
 };
+
+export type NestedPartial<T> = T extends object
+  ? {
+      [K in keyof T]?: NestedPartial<T[K]>;
+    }
+  : T;
+
+export type PropertiesForParameter = NestedPartial<Properties>;
 
 export class KintoneSdk {
   private restApiClient: KintoneRestAPIClient;
@@ -43,6 +52,20 @@ export class KintoneSdk {
       preview,
     });
     return fields;
+  }
+
+  public async addFormFields(params: {
+    appId: AppID;
+    fields: PropertiesForParameter;
+    revision?: Revision;
+  }) {
+    const { appId, fields, revision } = params;
+    const res = await this.restApiClient.app.addFormFields({
+      app: appId,
+      properties: fields,
+      ...(revision !== undefined && { revision }),
+    });
+    return res;
   }
 
   public async getViews(params: { appId: AppID }) {
