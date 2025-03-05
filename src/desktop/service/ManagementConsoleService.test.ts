@@ -212,11 +212,29 @@ describe("MessageService", () => {
       const result = await managementConsoleService.upsertAppList("1" as AppID);
 
       expect(mockkintoneSdk.getApps).toHaveBeenCalled();
-      expect(mockkintoneSdk.updateAllRecords).toHaveBeenCalledWith(
-        "1",
-        true,
-        expect.any(Array),
-      );
+      expect(mockkintoneSdk.updateAllRecords).toHaveBeenCalledWith({
+        appId: "1",
+        upsert: true,
+        records: [
+          {
+            id: "1",
+            record: {
+              appId: { value: "1" },
+              code: { value: "code1" },
+              name: { value: "name1" },
+              description: { value: "description1" },
+              spaceId: { value: "spaceId1" },
+              threadId: { value: "threadId1" },
+              createdAt: { value: "createdAt1" },
+              creator_code: { value: "creatorCode1" },
+              creator_name: { value: "creatorName1" },
+              modifiedAt: { value: "modifiedAt1" },
+              modifier_code: { value: "modifierCode1" },
+              modifier_name: { value: "modifierName1" },
+            },
+          },
+        ],
+      });
       expect(result).toEqual(mockResponse);
     });
   });

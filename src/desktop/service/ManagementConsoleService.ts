@@ -26,11 +26,11 @@ export class ManagementConsoleService {
   public async upsertAppList(appId: AppID): Promise<UpdateRecordsForResponse> {
     const apps = (await this.kintoneSdk.getApps()).apps;
     const recordsForUpdate = this.makeRecordsForUpdate(apps);
-    const response = await this.kintoneSdk.updateAllRecords(
-      appId,
-      true,
-      recordsForUpdate,
-    );
+    const response = await this.kintoneSdk.updateAllRecords({
+      appId: appId,
+      upsert: true,
+      records: recordsForUpdate,
+    });
     return response.records;
   }
 
@@ -76,61 +76,4 @@ export class ManagementConsoleService {
 
     return recordsForUpdate;
   }
-  // public makeRecordsForUpdate(apps: App[]): Array<{
-  //   id: RecordID;
-  //   record?: RecordForParameter;
-  //   revision?: Revision;
-  // }> {
-  //   const recordsForUpdate: Array<{
-  //     id: RecordID;
-  //     record?: RecordForParameter;
-  //     revision?: Revision;
-  //   }> = apps.map((app) => {
-  //     const record: RecordForParameter = {
-  //       [this.config.mappedGetAppsResponse.appId]: {
-  //         value: app.appId,
-  //       },
-  //       [this.config.mappedGetAppsResponse.code]: {
-  //         value: app.code,
-  //       },
-  //       [this.config.mappedGetAppsResponse.name]: {
-  //         value: app.name,
-  //       },
-  //       [this.config.mappedGetAppsResponse.description]: {
-  //         value: app.description,
-  //       },
-  //       [this.config.mappedGetAppsResponse.spaceId]: {
-  //         value: app.spaceId,
-  //       },
-  //       [this.config.mappedGetAppsResponse.threadId]: {
-  //         value: app.threadId,
-  //       },
-  //       [this.config.mappedGetAppsResponse.createdAt]: {
-  //         value: app.createdAt,
-  //       },
-  //       [this.config.mappedGetAppsResponse.creator_code]: {
-  //         value: app.creator.code,
-  //       },
-  //       [this.config.mappedGetAppsResponse.creator_name]: {
-  //         value: app.creator.name,
-  //       },
-  //       [this.config.mappedGetAppsResponse.modifiedAt]: {
-  //         value: app.modifiedAt,
-  //       },
-  //       [this.config.mappedGetAppsResponse.modifier_code]: {
-  //         value: app.modifier.code,
-  //       },
-  //       [this.config.mappedGetAppsResponse.modifier_name]: {
-  //         value: app.modifier.name,
-  //       },
-  //     };
-
-  //     return {
-  //       id: app.appId,
-  //       record,
-  //     };
-  //   });
-
-  //   return recordsForUpdate;
-  // }
 }

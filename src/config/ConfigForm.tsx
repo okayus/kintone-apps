@@ -55,7 +55,7 @@ const ConfigForm: React.FC<AppProps> = ({
   useEffect(() => {
     const fetchApps = async () => {
       try {
-        const response = await kintoneSdk.fetchFields(
+        const response = await kintoneSdk.getFormFields(
           Number(kintoneUtil.getId()),
         );
 
