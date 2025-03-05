@@ -51,10 +51,17 @@ interface KintoneEvent {
     renderButton(
       container,
       async () => {
-        const records = await managementConsoleService.upsertAppList(
+        const upsertAppList = await managementConsoleService.upsertAppList(
           event.appId,
         );
-        alert(`レコードを更新しました: ${records.length}件`);
+        alert(
+          `managementConsoleServiceレコードを更新しました: ${upsertAppList.length}件`,
+        );
+        const upsertFormFields =
+          await managementConsoleService.upsertFormFieldList(upsertAppList);
+        alert(
+          `managementConsoleServiceフォームを更新しました: ${upsertFormFields.length}件`,
+        );
       },
       `[${event.viewName}]のレコードを表示`,
     );

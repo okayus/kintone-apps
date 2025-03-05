@@ -38,9 +38,10 @@ export class KintoneSdk {
 
   public async getFormFields(params: { appId: AppID; preview?: boolean }) {
     const { appId, preview = true } = params;
-    const fields = (
-      await this.restApiClient.app.getFormFields({ app: appId, preview })
-    ).properties;
+    const fields = await this.restApiClient.app.getFormFields({
+      app: appId,
+      preview,
+    });
     return fields;
   }
 

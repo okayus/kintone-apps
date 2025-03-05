@@ -7,9 +7,11 @@ import type { ConfigSchema } from "../../shared/types/Config";
 import type {
   App,
   AppID,
+  Properties,
   Record,
   RecordID,
   Revision,
+  UpdateKey,
   UpdateRecordsForResponse,
 } from "@kintone/rest-api-client/lib/src/client/types";
 import type { SingleLineText } from "@kintone/rest-api-client/lib/src/KintoneFields/types/field";
@@ -23,24 +25,27 @@ export class ManagementConsoleService {
     this.kintoneSdk = kintoneSdk;
   }
 
-  public async upsertAppList(appId: AppID): Promise<UpdateRecordsForResponse> {
+  public async upsertAppList(appId: AppID): Promise<AppID[]> {
     const apps = (await this.kintoneSdk.getApps()).apps;
     const recordsForUpdate = this.makeRecordsForUpdate(apps);
-    const response = await this.kintoneSdk.updateAllRecords({
+    await this.kintoneSdk.updateAllRecords({
       appId: appId,
       upsert: true,
       records: recordsForUpdate,
     });
-    return response.records;
+    const appIds = recordsForUpdate.map((record) => {
+      return record.updateKey.value;
+    });
+    return appIds;
   }
 
   public makeRecordsForUpdate(apps: App[]): Array<{
-    id: RecordID;
+    updateKey: UpdateKey;
     record?: RecordForParameter;
     revision?: Revision;
   }> {
     const recordsForUpdate: Array<{
-      id: RecordID;
+      updateKey: UpdateKey;
       record?: RecordForParameter;
       revision?: Revision;
     }> = apps.map((app) => {
@@ -49,7 +54,7 @@ export class ManagementConsoleService {
       Object.keys(this.config.mappedGetAppsResponse).forEach((key) => {
         const appKey = key as keyof App;
         const configKey = this.config.mappedGetAppsResponse[key] as string;
-        if (app[appKey] !== undefined) {
+        if (app[appKey] !== undefined && appKey !== "appId") {
           record[configKey] = { value: app[appKey] };
         } else if (app.creator && appKey.startsWith("creator_")) {
           record[configKey] = {
@@ -69,7 +74,66 @@ export class ManagementConsoleService {
       });
 
       return {
-        id: app.appId,
+        updateKey: {
+          field: this.config.mappedGetAppsResponse.appId,
+          value: `${app.appId}`,
+        },
+        record,
+      };
+    });
+
+    return recordsForUpdate;
+  }
+
+  public async upsertFormFieldList(
+    appIds: AppID[],
+  ): Promise<UpdateRecordsForResponse> {
+    // appIdsに対して、それぞれのアプリのフォームフィールドを取得
+    const recordsForUpsertFormFieldsList = await Promise.all(
+      appIds.map(async (appId) => {
+        const formFields = await this.kintoneSdk.getFormFields({
+          appId: appId,
+        });
+        return this.makeRecordsForUpsertFormFields(appId, formFields);
+      }),
+    );
+    const recordsForUpsertFormFields = recordsForUpsertFormFieldsList.flat();
+    const response = await this.kintoneSdk.updateAllRecords({
+      appId: this.config.FormFieldListApp.appId,
+      upsert: true,
+      records: recordsForUpsertFormFields,
+    });
+    return response.records;
+  }
+
+  public makeRecordsForUpsertFormFields(
+    appId: AppID,
+    formFields: {
+      properties: Properties;
+      revision: string;
+    },
+  ): Array<{
+    updateKey: UpdateKey;
+    record?: RecordForParameter;
+    revision?: Revision;
+  }> {
+    const recordsForUpdate: Array<{
+      updateKey: UpdateKey;
+      record?: RecordForParameter;
+      revision?: Revision;
+    }> = Object.keys(formFields.properties).map((fieldCode, index) => {
+      const field = formFields.properties[fieldCode];
+      const record: RecordForParameter = {
+        appId: { value: appId },
+        fieldCode: { value: field.code },
+        label: { value: field.label },
+        type: { value: field.type },
+      };
+      return {
+        updateKey: {
+          field: this.config.mappedGetFormFieldsResponse.primaryKey,
+          value: `${appId}-${field.code}`,
+        },
         record,
       };
     });

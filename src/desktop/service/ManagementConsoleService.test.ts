@@ -12,8 +12,10 @@ import type { ConfigSchema } from "../../shared/types/Config";
 import type {
   App,
   AppID,
+  Properties,
   RecordID,
   Revision,
+  UpdateKey,
   UpdateRecordsForResponse,
 } from "@kintone/rest-api-client/lib/src/client/types";
 
@@ -46,6 +48,7 @@ describe("MessageService", () => {
     mockkintoneSdk = new KintoneSdk(mockRestApiClient) as Mocked<KintoneSdk>;
     mockkintoneSdk.getApps = vi.fn();
     mockkintoneSdk.updateAllRecords = vi.fn();
+    mockkintoneSdk.getFormFields = vi.fn();
   });
 
   describe("makeRecordsForUpdate", () => {
@@ -109,15 +112,17 @@ describe("MessageService", () => {
         },
       ];
       const recordsForUpdate: Array<{
-        id: RecordID;
+        updateKey: UpdateKey;
         record?: RecordForParameter;
         revision?: Revision;
       }> = managementConsoleService.makeRecordsForUpdate(apps);
       expect(recordsForUpdate).toEqual([
         {
-          id: "1",
+          updateKey: {
+            field: "appId",
+            value: "1",
+          },
           record: {
-            appId: { value: "1" },
             code: { value: "code1" },
             name: { value: "name1" },
             description: { value: "description1" },
@@ -132,9 +137,11 @@ describe("MessageService", () => {
           } as RecordForParameter,
         },
         {
-          id: "2",
+          updateKey: {
+            field: "appId",
+            value: "2",
+          },
           record: {
-            appId: { value: "2" },
             code: { value: "code2" },
             name: { value: "name2" },
             description: { value: "description2" },
@@ -217,9 +224,11 @@ describe("MessageService", () => {
         upsert: true,
         records: [
           {
-            id: "1",
+            updateKey: {
+              field: "appId",
+              value: "1",
+            },
             record: {
-              appId: { value: "1" },
               code: { value: "code1" },
               name: { value: "name1" },
               description: { value: "description1" },
@@ -235,7 +244,394 @@ describe("MessageService", () => {
           },
         ],
       });
-      expect(result).toEqual(mockResponse);
+      expect(result).toEqual(["1"]);
+    });
+  });
+
+  describe("makeRecordsForUpsertFormFields", () => {
+    it("getFormFieldsのレスポンスからupdateAllRecordsの引数recordsを作成する", () => {
+      const mockConfig: ConfigSchema = {
+        mappedGetFormFieldsResponse: {
+          appId: "appId",
+          primaryKey: "primaryKey",
+          fieldCode: "fieldCode",
+          label: "label",
+          type: "type",
+        },
+      } as ConfigSchema;
+      const managementConsoleService = new ManagementConsoleService(
+        mockConfig,
+        mockkintoneSdk,
+      );
+      const formFields: { properties: Properties; revision: string } = {
+        properties: {
+          fieldCode1: {
+            type: "SINGLE_LINE_TEXT",
+            code: "fieldCode1",
+            label: "Field Label 1",
+            noLabel: false,
+            required: true,
+            unique: true,
+            maxLength: "64",
+            minLength: "0",
+            defaultValue: "",
+            expression: "",
+            hideExpression: false,
+          },
+          fieldCode2: {
+            type: "NUMBER",
+            code: "fieldCode2",
+            label: "Field Label 2",
+            noLabel: false,
+            required: false,
+            unique: false,
+            defaultValue: "",
+            digit: false,
+            displayScale: "",
+            unit: "",
+            unitPosition: "BEFORE",
+            maxValue: "",
+            minValue: "",
+          },
+          fieldCode3: {
+            type: "DATE",
+            code: "fieldCode3",
+            label: "Field Label 3",
+            noLabel: false,
+            required: false,
+            unique: false,
+            defaultValue: "",
+            defaultNowValue: false,
+          },
+        },
+        revision: "1",
+      };
+      const recordsForUpdate: Array<{
+        updateKey: UpdateKey;
+        record?: RecordForParameter;
+        revision?: Revision;
+      }> = managementConsoleService.makeRecordsForUpsertFormFields(
+        "1",
+        formFields,
+      );
+      expect(recordsForUpdate).toEqual([
+        {
+          updateKey: {
+            field: "primaryKey",
+            value: "1-fieldCode1",
+          },
+          record: {
+            appId: { value: "1" },
+            fieldCode: {
+              value: "fieldCode1",
+            },
+            label: {
+              value: "Field Label 1",
+            },
+            type: {
+              value: "SINGLE_LINE_TEXT",
+            },
+          } as RecordForParameter,
+        },
+        {
+          updateKey: {
+            field: "primaryKey",
+            value: "1-fieldCode2",
+          },
+          record: {
+            appId: { value: "1" },
+            fieldCode: {
+              value: "fieldCode2",
+            },
+            label: {
+              value: "Field Label 2",
+            },
+            type: {
+              value: "NUMBER",
+            },
+          } as RecordForParameter,
+        },
+        {
+          updateKey: {
+            field: "primaryKey",
+            value: "1-fieldCode3",
+          },
+          record: {
+            appId: { value: "1" },
+            fieldCode: {
+              value: "fieldCode3",
+            },
+            label: {
+              value: "Field Label 3",
+            },
+            type: {
+              value: "DATE",
+            },
+          } as RecordForParameter,
+        },
+      ]);
+    });
+  });
+
+  describe("upsertFormFieldsList", () => {
+    it("アプリにフィールド一覧を保存する", async () => {
+      const mockConfig: ConfigSchema = {
+        FormFieldListApp: {
+          appId: "2",
+        },
+        mappedGetFormFieldsResponse: {
+          appId: "appId",
+          primaryKey: "primaryKey",
+          fieldCode: "fieldCode",
+          label: "label",
+          type: "type",
+        },
+      } as ConfigSchema;
+
+      const managementConsoleService = new ManagementConsoleService(
+        mockConfig,
+        mockkintoneSdk,
+      );
+
+      const formFields: { properties: Properties; revision: string } = {
+        properties: {
+          fieldCode1: {
+            type: "SINGLE_LINE_TEXT",
+            code: "fieldCode1",
+            label: "Field Label 1",
+            noLabel: false,
+            required: true,
+            unique: true,
+            maxLength: "64",
+            minLength: "0",
+            defaultValue: "",
+            expression: "",
+            hideExpression: false,
+          },
+          fieldCode2: {
+            type: "NUMBER",
+            code: "fieldCode2",
+            label: "Field Label 2",
+            noLabel: false,
+            required: false,
+            unique: false,
+            defaultValue: "",
+            digit: false,
+            displayScale: "",
+            unit: "",
+            unitPosition: "BEFORE",
+            maxValue: "",
+            minValue: "",
+          },
+          fieldCode3: {
+            type: "DATE",
+            code: "fieldCode3",
+            label: "Field Label 3",
+            noLabel: false,
+            required: false,
+            unique: false,
+            defaultValue: "",
+            defaultNowValue: false,
+          },
+        },
+        revision: "1",
+      };
+
+      mockkintoneSdk.getFormFields.mockResolvedValue(formFields);
+
+      const mockResponse: UpdateRecordsForResponse = [
+        {
+          id: "1",
+          revision: "1",
+        },
+        {
+          id: "2",
+          revision: "1",
+        },
+        {
+          id: "3",
+          revision: "1",
+        },
+      ];
+
+      mockkintoneSdk.updateAllRecords.mockResolvedValue({
+        records: mockResponse,
+      });
+
+      const result = await managementConsoleService.upsertFormFieldList([
+        "1",
+        "2",
+        "3",
+      ] as AppID[]);
+
+      expect(mockkintoneSdk.updateAllRecords).toHaveBeenCalledWith({
+        appId: "2",
+        upsert: true,
+        records: [
+          {
+            updateKey: {
+              field: "primaryKey",
+              value: "1-fieldCode1",
+            },
+            record: {
+              appId: { value: "1" },
+              fieldCode: {
+                value: "fieldCode1",
+              },
+              label: {
+                value: "Field Label 1",
+              },
+              type: {
+                value: "SINGLE_LINE_TEXT",
+              },
+            },
+          },
+          {
+            updateKey: {
+              field: "primaryKey",
+              value: "1-fieldCode2",
+            },
+            record: {
+              appId: { value: "1" },
+              fieldCode: {
+                value: "fieldCode2",
+              },
+              label: {
+                value: "Field Label 2",
+              },
+              type: {
+                value: "NUMBER",
+              },
+            },
+          },
+          {
+            updateKey: {
+              field: "primaryKey",
+              value: "1-fieldCode3",
+            },
+            record: {
+              appId: { value: "1" },
+              fieldCode: {
+                value: "fieldCode3",
+              },
+              label: {
+                value: "Field Label 3",
+              },
+              type: {
+                value: "DATE",
+              },
+            },
+          },
+          {
+            updateKey: {
+              field: "primaryKey",
+              value: "2-fieldCode1",
+            },
+            record: {
+              appId: { value: "2" },
+              fieldCode: {
+                value: "fieldCode1",
+              },
+              label: {
+                value: "Field Label 1",
+              },
+              type: {
+                value: "SINGLE_LINE_TEXT",
+              },
+            },
+          },
+          {
+            updateKey: {
+              field: "primaryKey",
+              value: "2-fieldCode2",
+            },
+            record: {
+              appId: { value: "2" },
+              fieldCode: {
+                value: "fieldCode2",
+              },
+              label: {
+                value: "Field Label 2",
+              },
+              type: {
+                value: "NUMBER",
+              },
+            },
+          },
+          {
+            updateKey: {
+              field: "primaryKey",
+              value: "2-fieldCode3",
+            },
+            record: {
+              appId: { value: "2" },
+              fieldCode: {
+                value: "fieldCode3",
+              },
+              label: {
+                value: "Field Label 3",
+              },
+              type: {
+                value: "DATE",
+              },
+            },
+          },
+          {
+            updateKey: {
+              field: "primaryKey",
+              value: "3-fieldCode1",
+            },
+            record: {
+              appId: { value: "3" },
+              fieldCode: {
+                value: "fieldCode1",
+              },
+              label: {
+                value: "Field Label 1",
+              },
+              type: {
+                value: "SINGLE_LINE_TEXT",
+              },
+            },
+          },
+          {
+            updateKey: {
+              field: "primaryKey",
+              value: "3-fieldCode2",
+            },
+            record: {
+              appId: { value: "3" },
+              fieldCode: {
+                value: "fieldCode2",
+              },
+              label: {
+                value: "Field Label 2",
+              },
+              type: {
+                value: "NUMBER",
+              },
+            },
+          },
+          {
+            updateKey: {
+              field: "primaryKey",
+              value: "3-fieldCode3",
+            },
+            record: {
+              appId: { value: "3" },
+              fieldCode: {
+                value: "fieldCode3",
+              },
+              label: {
+                value: "Field Label 3",
+              },
+              type: {
+                value: "DATE",
+              },
+            },
+          },
+        ],
+      });
     });
   });
 });
