@@ -21,4 +21,16 @@ export interface ConfigSchema {
     modifier_name?: string;
     [k: string]: unknown;
   };
+  FormFieldListApp: {
+    appId: string;
+    [k: string]: unknown;
+  };
+  mappedGetFormFieldsResponse: {
+    appId: string;
+    primaryKey: string;
+    fieldCode: string;
+    label: string;
+    type: string;
+    [k: string]: unknown;
+  };
 }

@@ -22,8 +22,34 @@
         "code",
         "name"
       ]
+    },
+    "FormFieldListApp": {
+      "type": "object",
+      "properties": {
+        "appId": { "type": "string" }
+      },
+      "required": [
+        "appId"
+      ]    
+    },
+    "mappedGetFormFieldsResponse": {
+      "type": "object",
+      "properties": {
+        "appId": { "type": "string" },
+        "primaryKey": { "type": "string" },
+        "fieldCode": { "type": "string" },
+        "label": { "type": "string" },
+        "type": { "type": "string" }
+      },
+      "required": [
+        "appId",
+        "primaryKey",
+        "fieldCode",
+        "label",
+        "type"
+      ]
     }
   },
-  "required": ["mappedGetAppsResponse"],
+  "required": ["mappedGetAppsResponse", "FormFieldListApp", "mappedGetFormFieldsResponse"],
   "additionalProperties": false
 }

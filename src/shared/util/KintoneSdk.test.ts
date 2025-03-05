@@ -31,7 +31,11 @@ describe("kintoneSdk.getRecords", () => {
       .mockResolvedValueOnce({ records: mockRecords.slice(500, 1000) })
       .mockResolvedValueOnce({ records: [] });
 
-    const result = await kintoneApiService.getRecords(appId, fields, query);
+    const result = await kintoneApiService.getRecords({
+      appId: appId,
+      fields: fields,
+      query: query,
+    });
 
     expect(result.records).toHaveLength(1000);
     expect(mockClient.record.getRecords).toHaveBeenCalledTimes(3);
