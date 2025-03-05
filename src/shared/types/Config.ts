@@ -5,12 +5,20 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-export type NoName = string;
-
 export interface ConfigSchema {
-  prefix: NoName;
-  /**
-   * メッセージに表示するフィールド
-   */
-  fields: string[];
+  mappedGetAppsResponse: {
+    appId: string;
+    code: string;
+    name: string;
+    description?: string;
+    spaceId?: string;
+    threadId?: string;
+    createdAt?: string;
+    creator_code?: string;
+    creator_name?: string;
+    modifiedAt?: string;
+    modifier_code?: string;
+    modifier_name?: string;
+    [k: string]: unknown;
+  };
 }
