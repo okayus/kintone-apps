@@ -1,6 +1,6 @@
 {
   "name": "kintone-ms-apps",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "type": "module",
   "scripts": {
     "start": "node scripts/npm-start.js",
