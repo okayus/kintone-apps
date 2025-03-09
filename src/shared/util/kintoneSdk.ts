@@ -5,6 +5,7 @@ import {
 
 import type {
   AppID,
+  Layout,
   Properties,
   Record,
   RecordID,
@@ -25,6 +26,28 @@ export type NestedPartial<T> = T extends object
   : T;
 
 export type PropertiesForParameter = NestedPartial<Properties>;
+
+type RowLayoutForParameter = {
+  type: "ROW";
+  fields: Array<{
+    [key: string]: unknown;
+  }>;
+};
+type SubtableLayoutForParameter = {
+  type: "SUBTABLE";
+  code: string;
+  fields: Array<{
+    [key: string]: unknown;
+  }>;
+};
+type GroupLayoutForParameter = {
+  type: "GROUP";
+  code: string;
+  layout: RowLayoutForParameter[];
+};
+export type LayoutForParameter = Array<
+  RowLayoutForParameter | SubtableLayoutForParameter | GroupLayoutForParameter
+>;
 
 export class KintoneSdk {
   private restApiClient: KintoneRestAPIClient;
@@ -75,6 +98,20 @@ export class KintoneSdk {
       preview: true,
     });
     return layout;
+  }
+
+  public async updateFormLayout(params: {
+    app: AppID;
+    layout: Layout;
+    revision?: Revision;
+  }) {
+    const { app: appId, layout, revision } = params;
+    const res = await this.restApiClient.app.updateFormLayout({
+      app: appId,
+      layout,
+      ...(revision !== undefined && { revision }),
+    });
+    return res;
   }
 
   public async getViews(params: { appId: AppID }) {

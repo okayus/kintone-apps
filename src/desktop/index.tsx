@@ -79,5 +79,13 @@ interface KintoneEvent {
       alert("フォームを更新しました");
     };
     headerMenuSpace.appendChild(addFormFieldsButton);
+
+    const updateFormLayoutButton = document.createElement("button");
+    updateFormLayoutButton.textContent = "レイアウトを更新";
+    updateFormLayoutButton.onclick = async () => {
+      await managementConsoleService.updateFormLayoutRecords();
+      alert("レイアウトを更新しました");
+    };
+    headerMenuSpace.appendChild(updateFormLayoutButton);
   });
 })(kintone.$PLUGIN_ID);
