@@ -8,6 +8,7 @@ import type { ConfigSchema } from "../../shared/types/Config";
 import type {
   App,
   AppID,
+  Layout,
   Properties,
   Record,
   RecordID,
@@ -176,5 +177,56 @@ export class ManagementConsoleService {
         fields: fieldsByAppId[appId],
       });
     }
+  }
+
+  public async upsertFormLayoutList(
+    appIds: AppID[],
+  ): Promise<UpdateRecordsForResponse> {
+    // appIdsに対して、それぞれのアプリのフォームレイアウトを取得
+    const recordsForUpsertFormLayoutList = await Promise.all(
+      appIds.map(async (appId) => {
+        const formLayout = await this.kintoneSdk.getFormLayout({
+          appId: appId,
+        });
+        return this.makeRecordsForUpsertFormLayout(appId, formLayout);
+      }),
+    );
+    const recordsForUpsertFormLayout = recordsForUpsertFormLayoutList.flat();
+    const response = await this.kintoneSdk.updateAllRecords({
+      appId: this.config.FormLayout.appId,
+      upsert: true,
+      records: recordsForUpsertFormLayout,
+    });
+    return response.records;
+  }
+
+  public makeRecordsForUpsertFormLayout(
+    appId: AppID,
+    formLayout: {
+      layout: Layout;
+      revision: string;
+    },
+  ): Array<{
+    updateKey: UpdateKey;
+    record?: RecordForParameter;
+    revision?: Revision;
+  }> {
+    const recordsForUpdate: Array<{
+      updateKey: UpdateKey;
+      record?: RecordForParameter;
+      revision?: Revision;
+    }> = [
+      {
+        updateKey: {
+          field: this.config.mappedGetFormLayoutResponse.appId,
+          value: `${appId}`,
+        },
+        record: {
+          layout: { value: JSON.stringify(formLayout.layout) },
+        },
+      },
+    ];
+
+    return recordsForUpdate;
   }
 }

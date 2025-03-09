@@ -13,6 +13,7 @@ import type { ConfigSchema } from "../../shared/types/Config";
 import type {
   App,
   AppID,
+  Layout,
   Properties,
   Record,
   RecordID,
@@ -53,6 +54,7 @@ describe("MessageService", () => {
     mockkintoneSdk.getFormFields = vi.fn();
     mockkintoneSdk.getRecords = vi.fn();
     mockkintoneSdk.addFormFields = vi.fn();
+    mockkintoneSdk.getFormLayout = vi.fn();
   });
 
   describe("makeRecordsForUpdate", () => {
@@ -767,6 +769,84 @@ describe("MessageService", () => {
             label: "Field Label 1",
           },
         } as PropertiesForParameter,
+      });
+    });
+  });
+
+  describe("upsertFormLayoutList", () => {
+    it("フォームレイアウトを取得し、layoutを文字列として指定したアプリに保存する", async () => {
+      const mockConfig: ConfigSchema = {
+        FormLayout: {
+          appId: "3",
+        },
+        mappedGetFormLayoutResponse: {
+          appId: "appId",
+          layout: "layout",
+        },
+      } as ConfigSchema;
+
+      const managementConsoleService = new ManagementConsoleService(
+        mockConfig,
+        mockkintoneSdk,
+      );
+
+      const mockFieldLayout: Layout = [
+        {
+          type: "ROW",
+          fields: [
+            {
+              type: "SINGLE_LINE_TEXT",
+              code: "文字列1行_0",
+              size: {
+                width: "200",
+              },
+            },
+            {
+              type: "MULTI_LINE_TEXT",
+              code: "文字列複数行_0",
+              size: {
+                width: "200",
+                innerHeight: "100",
+              },
+            },
+          ],
+        },
+      ];
+
+      mockkintoneSdk.getFormLayout.mockResolvedValue({
+        layout: mockFieldLayout,
+        revision: "1",
+      });
+
+      const mockResponse: UpdateRecordsForResponse = [
+        {
+          id: "4",
+          revision: "1",
+        },
+      ];
+
+      mockkintoneSdk.updateAllRecords.mockResolvedValue({
+        records: mockResponse,
+      });
+
+      await managementConsoleService.upsertFormLayoutList(["4"]);
+
+      expect(mockkintoneSdk.updateAllRecords).toHaveBeenCalledWith({
+        appId: "3",
+        upsert: true,
+        records: [
+          {
+            updateKey: {
+              field: "appId",
+              value: "4",
+            },
+            record: {
+              layout: {
+                value: JSON.stringify(mockFieldLayout),
+              },
+            },
+          },
+        ],
       });
     });
   });

@@ -68,6 +68,15 @@ export class KintoneSdk {
     return res;
   }
 
+  public async getFormLayout(params: { appId: AppID; preview?: boolean }) {
+    const { appId } = params;
+    const layout = await this.restApiClient.app.getFormLayout({
+      app: appId,
+      preview: true,
+    });
+    return layout;
+  }
+
   public async getViews(params: { appId: AppID }) {
     const { appId } = params;
     const views = await this.restApiClient.app.getViews({ app: appId });
