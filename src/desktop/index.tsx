@@ -65,5 +65,14 @@ interface KintoneEvent {
       },
       `[${event.viewName}]のレコードを表示`,
     );
+
+    // 一旦DOM操作でheaderMenuSpaceにawait managementConsoleService.addFormFieldsFromRecords()を実行するボタンを追加する
+    const addFormFieldsButton = document.createElement("button");
+    addFormFieldsButton.textContent = "フォームを更新";
+    addFormFieldsButton.onclick = async () => {
+      await managementConsoleService.addFormFieldsFromRecords();
+      alert("フォームを更新しました");
+    };
+    headerMenuSpace.appendChild(addFormFieldsButton);
   });
 })(kintone.$PLUGIN_ID);

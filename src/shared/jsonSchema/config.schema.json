@@ -32,6 +32,15 @@
         "appId"
       ]    
     },
+    "changeFormFieldApp": {
+      "type": "object",
+      "properties": {
+        "appId": { "type": "string" }
+      },
+      "required": [
+        "appId"
+      ]    
+    },
     "mappedGetFormFieldsResponse": {
       "type": "object",
       "properties": {
@@ -50,6 +59,6 @@
       ]
     }
   },
-  "required": ["mappedGetAppsResponse", "FormFieldListApp", "mappedGetFormFieldsResponse"],
+  "required": ["mappedGetAppsResponse", "FormFieldListApp", "changeFormFieldApp", "mappedGetFormFieldsResponse"],
   "additionalProperties": false
 }
