@@ -732,18 +732,6 @@ describe("MessageService", () => {
         appId: "2",
       });
 
-      // expect(mockkintoneSdk.addFormFields).toHaveBeenCalledWith({
-      //   appId: "2",
-      //   fields: {
-      //     fieldCode1: {
-      //       type: "SINGLE_LINE_TEXT",
-      //       code: "fieldCode1",
-      //       label: "Field Label 1",
-      //     },
-      //   },
-      // });
-
-      // mockkintoneSdk.addFormFieldsが2回呼ばれることを確認する
       expect(mockkintoneSdk.addFormFields).toHaveBeenCalledTimes(2);
       // 1回目の呼び出しで引数が正しいことを確認する
       expect(mockkintoneSdk.addFormFields).toHaveBeenCalledWith({
