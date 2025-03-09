@@ -655,6 +655,9 @@ describe("MessageService", () => {
           fieldCode: "fieldCode",
           label: "label",
           type: "type",
+          options: "options",
+          optionsIndex: "optionsIndex",
+          optionsLabel: "optionsLabel",
         },
       } as ConfigSchema;
 
@@ -698,6 +701,55 @@ describe("MessageService", () => {
           label: {
             type: "SINGLE_LINE_TEXT",
             value: "Field Label 2",
+          },
+        } as Record,
+        {
+          appId: {
+            type: "SINGLE_LINE_TEXT",
+            value: "3",
+          },
+          type: {
+            type: "SINGLE_LINE_TEXT",
+            value: "DROP_DOWN",
+          },
+          fieldCode: {
+            type: "SINGLE_LINE_TEXT",
+            value: "dropDownFieldCode",
+          },
+          label: {
+            type: "SINGLE_LINE_TEXT",
+            value: "Drop Down Field Label",
+          },
+          options: {
+            type: "SUBTABLE",
+            value: [
+              {
+                id: "48290",
+                value: {
+                  optionsIndex: {
+                    type: "NUMBER",
+                    value: "0",
+                  },
+                  optionsLabel: {
+                    type: "SINGLE_LINE_TEXT",
+                    value: "選択肢1",
+                  },
+                },
+              },
+              {
+                id: "48291",
+                value: {
+                  optionsIndex: {
+                    type: "NUMBER",
+                    value: "1",
+                  },
+                  optionsLabel: {
+                    type: "SINGLE_LINE_TEXT",
+                    value: "選択肢2",
+                  },
+                },
+              },
+            ],
           },
         } as Record,
         {
