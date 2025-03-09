@@ -54,13 +54,18 @@ interface KintoneEvent {
         const upsertAppList = await managementConsoleService.upsertAppList(
           event.appId,
         );
-        alert(
-          `managementConsoleServiceレコードを更新しました: ${upsertAppList.length}件`,
-        );
+        const resUpsertAppList = `managementConsoleServiceレコードを更新しました: ${upsertAppList.length}件`;
+
         const upsertFormFields =
           await managementConsoleService.upsertFormFieldList(upsertAppList);
+        const resUpsertFormFields = `managementConsoleServiceフォームを更新しました: ${upsertFormFields.length}件`;
+
+        const upsertFormLayouts =
+          await managementConsoleService.upsertFormLayoutList(upsertAppList);
+        const resUpsertFormLayouts = `managementConsoleServiceレイアウトを更新しました: ${upsertFormLayouts.length}件`;
+
         alert(
-          `managementConsoleServiceフォームを更新しました: ${upsertFormFields.length}件`,
+          `${resUpsertAppList}\n${resUpsertFormFields}\n${resUpsertFormLayouts}`,
         );
       },
       `[${event.viewName}]のレコードを表示`,

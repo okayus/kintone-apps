@@ -37,4 +37,13 @@ export interface ConfigSchema {
     type: string;
     [k: string]: unknown;
   };
+  FormLayout: {
+    appId: string;
+    [k: string]: unknown;
+  };
+  mappedGetFormLayoutResponse: {
+    appId: string;
+    layout: string;
+    [k: string]: unknown;
+  };
 }
