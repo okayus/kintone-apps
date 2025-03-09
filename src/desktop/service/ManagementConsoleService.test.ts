@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, type Mocked, vi } from "vitest";
 
 import {
   KintoneSdk,
+  type PropertiesForParameter,
   type RecordForParameter,
 } from "../../shared/util/kintoneSdk";
 
@@ -639,9 +640,9 @@ describe("MessageService", () => {
   });
 
   describe("addFormFieldsFromRecords", () => {
-    it("should add form fields from records", async () => {
+    it("取得したレコードからaddFormFieldsを実行する", async () => {
       const mockConfig: ConfigSchema = {
-        FormFieldListApp: {
+        changeFormFieldApp: {
           appId: "2",
         },
         mappedGetFormFieldsResponse: {
@@ -660,13 +661,49 @@ describe("MessageService", () => {
 
       const mockRecordList: Record[] = [
         {
+          appId: {
+            type: "SINGLE_LINE_TEXT",
+            value: "3",
+          },
           type: {
             type: "SINGLE_LINE_TEXT",
             value: "SINGLE_LINE_TEXT",
           },
-          fieldCode1: {
+          fieldCode: {
+            type: "SINGLE_LINE_TEXT",
+            value: "fieldCode1",
+          },
+          label: {
             type: "SINGLE_LINE_TEXT",
             value: "Field Label 1",
+          },
+        } as Record,
+        {
+          appId: {
+            type: "SINGLE_LINE_TEXT",
+            value: "3",
+          },
+          type: {
+            type: "SINGLE_LINE_TEXT",
+            value: "SINGLE_LINE_TEXT",
+          },
+          fieldCode: {
+            type: "SINGLE_LINE_TEXT",
+            value: "fieldCode2",
+          },
+          label: {
+            type: "SINGLE_LINE_TEXT",
+            value: "Field Label 2",
+          },
+        } as Record,
+        {
+          appId: {
+            type: "SINGLE_LINE_TEXT",
+            value: "4",
+          },
+          type: {
+            type: "SINGLE_LINE_TEXT",
+            value: "SINGLE_LINE_TEXT",
           },
           fieldCode: {
             type: "SINGLE_LINE_TEXT",
@@ -691,15 +728,45 @@ describe("MessageService", () => {
         appId: "2",
       });
 
+      // expect(mockkintoneSdk.addFormFields).toHaveBeenCalledWith({
+      //   appId: "2",
+      //   fields: {
+      //     fieldCode1: {
+      //       type: "SINGLE_LINE_TEXT",
+      //       code: "fieldCode1",
+      //       label: "Field Label 1",
+      //     },
+      //   },
+      // });
+
+      // mockkintoneSdk.addFormFieldsが2回呼ばれることを確認する
+      expect(mockkintoneSdk.addFormFields).toHaveBeenCalledTimes(2);
+      // 1回目の呼び出しで引数が正しいことを確認する
       expect(mockkintoneSdk.addFormFields).toHaveBeenCalledWith({
-        appId: "2",
+        appId: "3",
         fields: {
           fieldCode1: {
             type: "SINGLE_LINE_TEXT",
             code: "fieldCode1",
             label: "Field Label 1",
           },
-        },
+          fieldCode2: {
+            type: "SINGLE_LINE_TEXT",
+            code: "fieldCode2",
+            label: "Field Label 2",
+          },
+        } as PropertiesForParameter,
+      });
+      // 2回目の呼び出しで引数が正しいことを確認する
+      expect(mockkintoneSdk.addFormFields).toHaveBeenCalledWith({
+        appId: "4",
+        fields: {
+          fieldCode1: {
+            type: "SINGLE_LINE_TEXT",
+            code: "fieldCode1",
+            label: "Field Label 1",
+          },
+        } as PropertiesForParameter,
       });
     });
   });

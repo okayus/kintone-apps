@@ -25,6 +25,10 @@ export interface ConfigSchema {
     appId: string;
     [k: string]: unknown;
   };
+  changeFormFieldApp: {
+    appId: string;
+    [k: string]: unknown;
+  };
   mappedGetFormFieldsResponse: {
     appId: string;
     primaryKey: string;
