@@ -229,4 +229,21 @@ export class ManagementConsoleService {
 
     return recordsForUpdate;
   }
+
+  public async updateFormLayoutRecords(): Promise<void> {
+    const records = await this.kintoneSdk.getRecords({
+      appId: this.config.updateFormLayoutApp.appId,
+    });
+
+    records.records.forEach(async (record) => {
+      const appId = record.appId.value as string;
+      const layout = JSON.parse(
+        record[this.config.mappedGetFormLayoutResponse.layout].value as string,
+      ) as Layout;
+      await this.kintoneSdk.updateFormLayout({
+        app: appId,
+        layout: layout,
+      });
+    });
+  }
 }

@@ -51,6 +51,13 @@
       },
       "required": ["appId"]
     },
+    "updateFormLayoutApp": {
+      "type": "object",
+      "properties": {
+        "appId": { "type": "string" }
+      },
+      "required": ["appId"]
+    },
     "mappedGetFormLayoutResponse": {
       "type": "object",
       "properties": {
@@ -66,6 +73,7 @@
     "changeFormFieldApp",
     "mappedGetFormFieldsResponse",
     "FormLayout",
+    "updateFormLayoutApp",
     "mappedGetFormLayoutResponse"
   ],
   "additionalProperties": false

@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, type Mocked, vi } from "vitest";
 
 import {
   KintoneSdk,
+  type LayoutForParameter,
   type PropertiesForParameter,
   type RecordForParameter,
 } from "../../shared/util/kintoneSdk";
@@ -55,6 +56,7 @@ describe("MessageService", () => {
     mockkintoneSdk.getRecords = vi.fn();
     mockkintoneSdk.addFormFields = vi.fn();
     mockkintoneSdk.getFormLayout = vi.fn();
+    mockkintoneSdk.updateFormLayout = vi.fn();
   });
 
   describe("makeRecordsForUpdate", () => {
@@ -847,6 +849,130 @@ describe("MessageService", () => {
             },
           },
         ],
+      });
+    });
+  });
+
+  describe("updateFormLayoutRecords", () => {
+    it("フォームレイアウトを取得し、layoutを文字列として指定したアプリに保存する", async () => {
+      const mockConfig: ConfigSchema = {
+        updateFormLayoutApp: {
+          appId: "3",
+        },
+        mappedGetFormLayoutResponse: {
+          appId: "appId",
+          layout: "layout",
+        },
+      } as ConfigSchema;
+
+      const managementConsoleService = new ManagementConsoleService(
+        mockConfig,
+        mockkintoneSdk,
+      );
+
+      const layout: LayoutForParameter = [
+        {
+          type: "ROW",
+          fields: [
+            {
+              type: "SINGLE_LINE_TEXT",
+              code: "文字列1行_0",
+              size: {
+                width: 200,
+              },
+            },
+            {
+              type: "MULTI_LINE_TEXT",
+              code: "文字列複数行_0",
+              size: {
+                width: 200,
+                innerHeight: 100,
+              },
+            },
+            {
+              type: "LABEL",
+              label: "label",
+              size: {
+                width: 200,
+              },
+            },
+            {
+              type: "SPACER",
+              elementId: "spacer",
+              size: {
+                width: 200,
+                height: 100,
+              },
+            },
+            {
+              type: "HR",
+              size: {
+                width: 200,
+              },
+            },
+          ],
+        },
+        {
+          type: "SUBTABLE",
+          code: "テーブル_0",
+          fields: [
+            {
+              type: "NUMBER",
+              code: "数値_0",
+              size: {
+                width: 200,
+              },
+            },
+          ],
+        },
+        {
+          type: "GROUP",
+          code: "グループ",
+          layout: [
+            {
+              type: "ROW",
+              fields: [
+                {
+                  type: "NUMBER",
+                  code: "数値_1",
+                  size: {
+                    width: 200,
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      ];
+
+      const mockRecordList: Record[] = [
+        {
+          appId: {
+            type: "SINGLE_LINE_TEXT",
+            value: "5",
+          },
+          layout: {
+            type: "MULTI_LINE_TEXT",
+            value: JSON.stringify(layout),
+          },
+        } as Record,
+      ];
+
+      const mockRecords = {
+        records: mockRecordList,
+      };
+
+      mockkintoneSdk.getRecords.mockResolvedValue(mockRecords);
+
+      await managementConsoleService.updateFormLayoutRecords();
+
+      expect(mockkintoneSdk.getRecords).toHaveBeenCalledWith({
+        appId: "3",
+      });
+
+      expect(mockkintoneSdk.updateFormLayout).toHaveBeenCalledWith({
+        app: "5",
+        layout: layout as LayoutForParameter,
       });
     });
   });
