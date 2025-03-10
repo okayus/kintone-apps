@@ -248,6 +248,24 @@ export class ManagementConsoleService {
         field.code = code;
       }
 
+      if (type === "DROP_DOWN") {
+        const options = record[this.config.mappedGetFormFieldsResponse.options]
+          .value as Array<{ value: { [key: string]: { value: string } } }>;
+        field.options = options.reduce(
+          (acc, option) => {
+            const index =
+              option.value[this.config.mappedGetFormFieldsResponse.optionsIndex]
+                .value;
+            const optionLabel =
+              option.value[this.config.mappedGetFormFieldsResponse.optionsLabel]
+                .value;
+            acc[optionLabel] = { index, label: optionLabel };
+            return acc;
+          },
+          {} as { [key: string]: { index: string; label: string } },
+        );
+      }
+
       fieldsByAppId[appId][fieldCode] = field;
     });
 
