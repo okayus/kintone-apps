@@ -40,9 +40,21 @@
         "primaryKey": { "type": "string" },
         "fieldCode": { "type": "string" },
         "label": { "type": "string" },
-        "type": { "type": "string" }
+        "type": { "type": "string" },
+        "options": { "type": "string" },
+        "optionsLabel": { "type": "string" },
+        "optionsIndex": { "type": "string" }
       },
-      "required": ["appId", "primaryKey", "fieldCode", "label", "type"]
+      "required": [
+        "appId",
+        "primaryKey",
+        "fieldCode",
+        "label",
+        "type",
+        "options",
+        "optionsLabel",
+        "optionsIndex"
+      ]
     },
     "FormLayout": {
       "type": "object",

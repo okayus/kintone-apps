@@ -655,6 +655,9 @@ describe("MessageService", () => {
           fieldCode: "fieldCode",
           label: "label",
           type: "type",
+          options: "options",
+          optionsIndex: "optionsIndex",
+          optionsLabel: "optionsLabel",
         },
       } as ConfigSchema;
 
@@ -703,6 +706,55 @@ describe("MessageService", () => {
         {
           appId: {
             type: "SINGLE_LINE_TEXT",
+            value: "3",
+          },
+          type: {
+            type: "SINGLE_LINE_TEXT",
+            value: "DROP_DOWN",
+          },
+          fieldCode: {
+            type: "SINGLE_LINE_TEXT",
+            value: "dropDownFieldCode",
+          },
+          label: {
+            type: "SINGLE_LINE_TEXT",
+            value: "Drop Down Field Label",
+          },
+          options: {
+            type: "SUBTABLE",
+            value: [
+              {
+                id: "48290",
+                value: {
+                  optionsIndex: {
+                    type: "NUMBER",
+                    value: "0",
+                  },
+                  optionsLabel: {
+                    type: "SINGLE_LINE_TEXT",
+                    value: "選択肢1",
+                  },
+                },
+              },
+              {
+                id: "48291",
+                value: {
+                  optionsIndex: {
+                    type: "NUMBER",
+                    value: "1",
+                  },
+                  optionsLabel: {
+                    type: "SINGLE_LINE_TEXT",
+                    value: "選択肢2",
+                  },
+                },
+              },
+            ],
+          },
+        } as Record,
+        {
+          appId: {
+            type: "SINGLE_LINE_TEXT",
             value: "4",
           },
           type: {
@@ -732,18 +784,6 @@ describe("MessageService", () => {
         appId: "2",
       });
 
-      // expect(mockkintoneSdk.addFormFields).toHaveBeenCalledWith({
-      //   appId: "2",
-      //   fields: {
-      //     fieldCode1: {
-      //       type: "SINGLE_LINE_TEXT",
-      //       code: "fieldCode1",
-      //       label: "Field Label 1",
-      //     },
-      //   },
-      // });
-
-      // mockkintoneSdk.addFormFieldsが2回呼ばれることを確認する
       expect(mockkintoneSdk.addFormFields).toHaveBeenCalledTimes(2);
       // 1回目の呼び出しで引数が正しいことを確認する
       expect(mockkintoneSdk.addFormFields).toHaveBeenCalledWith({
@@ -758,6 +798,21 @@ describe("MessageService", () => {
             type: "SINGLE_LINE_TEXT",
             code: "fieldCode2",
             label: "Field Label 2",
+          },
+          dropDownFieldCode: {
+            type: "DROP_DOWN",
+            code: "dropDownFieldCode",
+            label: "Drop Down Field Label",
+            options: {
+              選択肢1: {
+                index: "0",
+                label: "選択肢1",
+              },
+              選択肢2: {
+                index: "1",
+                label: "選択肢2",
+              },
+            },
           },
         } as PropertiesForParameter,
       });

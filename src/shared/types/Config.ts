@@ -35,6 +35,9 @@ export interface ConfigSchema {
     fieldCode: string;
     label: string;
     type: string;
+    options: string;
+    optionsLabel: string;
+    optionsIndex: string;
     [k: string]: unknown;
   };
   FormLayout: {

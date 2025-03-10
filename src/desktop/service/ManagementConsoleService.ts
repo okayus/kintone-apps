@@ -164,11 +164,31 @@ export class ManagementConsoleService {
       const type = record[this.config.mappedGetFormFieldsResponse.type]
         .value as string;
 
-      fieldsByAppId[appId][fieldCode] = {
+      const field: any = {
         type,
         code: fieldCode,
         label,
       };
+
+      if (type === "DROP_DOWN") {
+        const options = record[this.config.mappedGetFormFieldsResponse.options]
+          .value as Array<{ value: { [key: string]: { value: string } } }>;
+        field.options = options.reduce(
+          (acc, option) => {
+            const index =
+              option.value[this.config.mappedGetFormFieldsResponse.optionsIndex]
+                .value;
+            const optionLabel =
+              option.value[this.config.mappedGetFormFieldsResponse.optionsLabel]
+                .value;
+            acc[optionLabel] = { index, label: optionLabel };
+            return acc;
+          },
+          {} as { [key: string]: { index: string; label: string } },
+        );
+      }
+
+      fieldsByAppId[appId][fieldCode] = field;
     });
 
     for (const appId in fieldsByAppId) {
