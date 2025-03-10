@@ -211,22 +211,32 @@ export class ManagementConsoleService {
       const primaryKey = record[
         this.config.mappedGetFormFieldsResponse.primaryKey
       ].value as string;
+      const fieldCode = record[
+        this.config.mappedGetFormFieldsResponse.fieldCode
+      ].value as string;
 
-      if (!primaryKey) {
-        return; // primaryKeyがブランクかどうかで新規追加か更新かを判定する
+      // primaryKeyとfieldCodeが両方ある場合のみ更新対象とする
+      if (!primaryKey || !fieldCode) {
+        return;
       }
-
       if (!fieldsByAppId[appId]) {
         fieldsByAppId[appId] = {};
       }
 
-      const fieldCode = record[
-        this.config.mappedGetFormFieldsResponse.fieldCode
-      ].value as string;
       const label = record[this.config.mappedGetFormFieldsResponse.label]
         .value as string;
+      const code = record[this.config.mappedGetFormFieldsResponse.code]
+        .value as string;
 
-      fieldsByAppId[appId][fieldCode] = { label };
+      const field: any = {};
+      if (label) {
+        field.label = label;
+      }
+      if (code) {
+        field.code = code;
+      }
+
+      fieldsByAppId[appId][fieldCode] = field;
     });
 
     for (const appId in fieldsByAppId) {

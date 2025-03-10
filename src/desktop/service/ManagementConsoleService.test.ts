@@ -841,6 +841,7 @@ describe("MessageService", () => {
           appId: "appId",
           primaryKey: "primaryKey",
           fieldCode: "fieldCode",
+          code: "code",
           label: "label",
           type: "type",
           options: "options",
@@ -868,6 +869,10 @@ describe("MessageService", () => {
             type: "SINGLE_LINE_TEXT",
             value: "fieldCode1",
           },
+          code: {
+            type: "SINGLE_LINE_TEXT",
+            value: "",
+          },
           label: {
             type: "SINGLE_LINE_TEXT",
             value: "Field Label 1 changed",
@@ -890,6 +895,10 @@ describe("MessageService", () => {
             type: "SINGLE_LINE_TEXT",
             value: "fieldCode2",
           },
+          code: {
+            type: "SINGLE_LINE_TEXT",
+            value: "",
+          },
           label: {
             type: "SINGLE_LINE_TEXT",
             value: "Field Label 2 changed",
@@ -909,6 +918,10 @@ describe("MessageService", () => {
             value: "",
           },
           fieldCode: {
+            type: "SINGLE_LINE_TEXT",
+            value: "fieldCode3",
+          },
+          code: {
             type: "SINGLE_LINE_TEXT",
             value: "fieldCode3",
           },
@@ -933,6 +946,10 @@ describe("MessageService", () => {
           fieldCode: {
             type: "SINGLE_LINE_TEXT",
             value: "fieldCode1",
+          },
+          code: {
+            type: "SINGLE_LINE_TEXT",
+            value: "fieldCode1changed",
           },
           label: {
             type: "SINGLE_LINE_TEXT",
@@ -975,6 +992,7 @@ describe("MessageService", () => {
         appId: "4",
         fields: {
           fieldCode1: {
+            code: "fieldCode1changed",
             label: "Field Label 1 changed",
           },
         } as PropertiesForParameter,
