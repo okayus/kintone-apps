@@ -199,6 +199,44 @@ export class ManagementConsoleService {
     }
   }
 
+  public async updateFormFieldsFromRecords(): Promise<void> {
+    const records = await this.kintoneSdk.getRecords({
+      appId: this.config.changeFormFieldApp.appId,
+    });
+
+    const fieldsByAppId: { [key: string]: PropertiesForParameter } = {};
+
+    records.records.forEach((record) => {
+      const appId = record.appId.value as string;
+      const primaryKey = record[
+        this.config.mappedGetFormFieldsResponse.primaryKey
+      ].value as string;
+
+      if (!primaryKey) {
+        return; // primaryKeyがブランクかどうかで新規追加か更新かを判定する
+      }
+
+      if (!fieldsByAppId[appId]) {
+        fieldsByAppId[appId] = {};
+      }
+
+      const fieldCode = record[
+        this.config.mappedGetFormFieldsResponse.fieldCode
+      ].value as string;
+      const label = record[this.config.mappedGetFormFieldsResponse.label]
+        .value as string;
+
+      fieldsByAppId[appId][fieldCode] = { label };
+    });
+
+    for (const appId in fieldsByAppId) {
+      await this.kintoneSdk.updateFormFields({
+        appId,
+        fields: fieldsByAppId[appId],
+      });
+    }
+  }
+
   public async upsertFormLayoutList(
     appIds: AppID[],
   ): Promise<UpdateRecordsForResponse> {

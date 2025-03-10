@@ -91,6 +91,20 @@ export class KintoneSdk {
     return res;
   }
 
+  public async updateFormFields(params: {
+    appId: AppID;
+    fields: PropertiesForParameter;
+    revision?: Revision;
+  }) {
+    const { appId, fields, revision } = params;
+    const res = await this.restApiClient.app.updateFormFields({
+      app: appId,
+      properties: fields,
+      ...(revision !== undefined && { revision }),
+    });
+    return res;
+  }
+
   public async getFormLayout(params: { appId: AppID; preview?: boolean }) {
     const { appId } = params;
     const layout = await this.restApiClient.app.getFormLayout({

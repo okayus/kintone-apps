@@ -55,6 +55,7 @@ describe("MessageService", () => {
     mockkintoneSdk.getFormFields = vi.fn();
     mockkintoneSdk.getRecords = vi.fn();
     mockkintoneSdk.addFormFields = vi.fn();
+    mockkintoneSdk.updateFormFields = vi.fn();
     mockkintoneSdk.getFormLayout = vi.fn();
     mockkintoneSdk.updateFormLayout = vi.fn();
   });
@@ -824,6 +825,157 @@ describe("MessageService", () => {
             type: "SINGLE_LINE_TEXT",
             code: "fieldCode1",
             label: "Field Label 1",
+          },
+        } as PropertiesForParameter,
+      });
+    });
+  });
+
+  describe("updateFormFieldsFromRecords", () => {
+    it("取得したレコードからupdateFormFieldsを実行する", async () => {
+      const mockConfig: ConfigSchema = {
+        changeFormFieldApp: {
+          appId: "2",
+        },
+        mappedGetFormFieldsResponse: {
+          appId: "appId",
+          primaryKey: "primaryKey",
+          fieldCode: "fieldCode",
+          label: "label",
+          type: "type",
+          options: "options",
+          optionsIndex: "optionsIndex",
+          optionsLabel: "optionsLabel",
+        },
+      } as ConfigSchema;
+
+      const managementConsoleService = new ManagementConsoleService(
+        mockConfig,
+        mockkintoneSdk,
+      );
+
+      const mockRecordList: Record[] = [
+        {
+          appId: {
+            type: "SINGLE_LINE_TEXT",
+            value: "3",
+          },
+          type: {
+            type: "SINGLE_LINE_TEXT",
+            value: "",
+          },
+          fieldCode: {
+            type: "SINGLE_LINE_TEXT",
+            value: "fieldCode1",
+          },
+          label: {
+            type: "SINGLE_LINE_TEXT",
+            value: "Field Label 1 changed",
+          },
+          primaryKey: {
+            type: "SINGLE_LINE_TEXT",
+            value: "3-fieldCode1",
+          },
+        } as Record,
+        {
+          appId: {
+            type: "SINGLE_LINE_TEXT",
+            value: "3",
+          },
+          type: {
+            type: "SINGLE_LINE_TEXT",
+            value: "",
+          },
+          fieldCode: {
+            type: "SINGLE_LINE_TEXT",
+            value: "fieldCode2",
+          },
+          label: {
+            type: "SINGLE_LINE_TEXT",
+            value: "Field Label 2 changed",
+          },
+          primaryKey: {
+            type: "SINGLE_LINE_TEXT",
+            value: "3-fieldCode2",
+          },
+        } as Record,
+        {
+          appId: {
+            type: "SINGLE_LINE_TEXT",
+            value: "3",
+          },
+          type: {
+            type: "SINGLE_LINE_TEXT",
+            value: "",
+          },
+          fieldCode: {
+            type: "SINGLE_LINE_TEXT",
+            value: "fieldCode3",
+          },
+          label: {
+            type: "SINGLE_LINE_TEXT",
+            value: "Field Label 3",
+          },
+          primaryKey: {
+            type: "SINGLE_LINE_TEXT",
+            value: "",
+          },
+        } as Record,
+        {
+          appId: {
+            type: "SINGLE_LINE_TEXT",
+            value: "4",
+          },
+          type: {
+            type: "SINGLE_LINE_TEXT",
+            value: "",
+          },
+          fieldCode: {
+            type: "SINGLE_LINE_TEXT",
+            value: "fieldCode1",
+          },
+          label: {
+            type: "SINGLE_LINE_TEXT",
+            value: "Field Label 1 changed",
+          },
+          primaryKey: {
+            type: "SINGLE_LINE_TEXT",
+            value: "4-fieldCode1",
+          },
+        } as Record,
+      ];
+
+      const mockRecords = {
+        records: mockRecordList,
+      };
+
+      mockkintoneSdk.getRecords.mockResolvedValue(mockRecords);
+
+      await managementConsoleService.updateFormFieldsFromRecords();
+
+      expect(mockkintoneSdk.getRecords).toHaveBeenCalledWith({
+        appId: "2",
+      });
+
+      expect(mockkintoneSdk.updateFormFields).toHaveBeenCalledTimes(2);
+      // 1回目の呼び出しで引数が正しいことを確認する
+      expect(mockkintoneSdk.updateFormFields).toHaveBeenCalledWith({
+        appId: "3",
+        fields: {
+          fieldCode1: {
+            label: "Field Label 1 changed",
+          },
+          fieldCode2: {
+            label: "Field Label 2 changed",
+          },
+        } as PropertiesForParameter,
+      });
+      // 2回目の呼び出しで引数が正しいことを確認する
+      expect(mockkintoneSdk.updateFormFields).toHaveBeenCalledWith({
+        appId: "4",
+        fields: {
+          fieldCode1: {
+            label: "Field Label 1 changed",
           },
         } as PropertiesForParameter,
       });
