@@ -151,6 +151,15 @@ export class ManagementConsoleService {
     const fieldsByAppId: { [key: string]: PropertiesForParameter } = {};
 
     records.records.forEach((record) => {
+      const primaryKey = record[
+        this.config.mappedGetFormFieldsResponse.primaryKey
+      ].value as string;
+
+      // primaryKeyがブランクの場合のみ追加対象とする
+      if (primaryKey) {
+        return;
+      }
+
       const appId = record.appId.value as string;
       if (!fieldsByAppId[appId]) {
         fieldsByAppId[appId] = {};
@@ -193,6 +202,57 @@ export class ManagementConsoleService {
 
     for (const appId in fieldsByAppId) {
       await this.kintoneSdk.addFormFields({
+        appId,
+        fields: fieldsByAppId[appId],
+      });
+    }
+  }
+
+  public async updateFormFieldsFromRecords(): Promise<void> {
+    const records = await this.kintoneSdk.getRecords({
+      appId: this.config.changeFormFieldApp.appId,
+    });
+
+    const fieldsByAppId: { [key: string]: PropertiesForParameter } = {};
+
+    records.records.forEach((record) => {
+      const appId = record.appId.value as string;
+      const primaryKey = record[
+        this.config.mappedGetFormFieldsResponse.primaryKey
+      ].value as string;
+      const fieldCode = record[
+        this.config.mappedGetFormFieldsResponse.fieldCode
+      ].value as string;
+      const type = record[this.config.mappedGetFormFieldsResponse.type]
+        .value as string;
+
+      // primaryKey,fieldCode,typeの全てがある場合のみ更新対象とする
+      if (!primaryKey || !fieldCode || !type) {
+        return;
+      }
+      if (!fieldsByAppId[appId]) {
+        fieldsByAppId[appId] = {};
+      }
+
+      const label = record[this.config.mappedGetFormFieldsResponse.label]
+        .value as string;
+      const code = record[this.config.mappedGetFormFieldsResponse.code]
+        .value as string;
+
+      const field: any = {};
+      field.type = type;
+      if (label) {
+        field.label = label;
+      }
+      if (code) {
+        field.code = code;
+      }
+
+      fieldsByAppId[appId][fieldCode] = field;
+    });
+
+    for (const appId in fieldsByAppId) {
+      await this.kintoneSdk.updateFormFields({
         appId,
         fields: fieldsByAppId[appId],
       });

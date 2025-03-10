@@ -33,6 +33,7 @@ export interface ConfigSchema {
     appId: string;
     primaryKey: string;
     fieldCode: string;
+    code: string;
     label: string;
     type: string;
     options: string;
