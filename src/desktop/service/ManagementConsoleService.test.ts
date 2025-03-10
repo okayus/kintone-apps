@@ -998,6 +998,63 @@ describe("MessageService", () => {
             value: "4-fieldCode1",
           },
         } as Record,
+        {
+          appId: {
+            type: "SINGLE_LINE_TEXT",
+            value: "4",
+          },
+          type: {
+            type: "SINGLE_LINE_TEXT",
+            value: "DROP_DOWN",
+          },
+          fieldCode: {
+            type: "SINGLE_LINE_TEXT",
+            value: "dropDownFieldCode",
+          },
+          code: {
+            type: "SINGLE_LINE_TEXT",
+            value: "",
+          },
+          label: {
+            type: "SINGLE_LINE_TEXT",
+            value: "",
+          },
+          options: {
+            type: "SUBTABLE",
+            value: [
+              {
+                id: "48290",
+                value: {
+                  optionsIndex: {
+                    type: "NUMBER",
+                    value: "0",
+                  },
+                  optionsLabel: {
+                    type: "SINGLE_LINE_TEXT",
+                    value: "選択肢1",
+                  },
+                },
+              },
+              {
+                id: "48291",
+                value: {
+                  optionsIndex: {
+                    type: "NUMBER",
+                    value: "1",
+                  },
+                  optionsLabel: {
+                    type: "SINGLE_LINE_TEXT",
+                    value: "選択肢2",
+                  },
+                },
+              },
+            ],
+          },
+          primaryKey: {
+            type: "SINGLE_LINE_TEXT",
+            value: "4-dropDownFieldCode",
+          },
+        } as Record,
       ];
 
       const mockRecords = {
@@ -1035,6 +1092,19 @@ describe("MessageService", () => {
             type: "SINGLE_LINE_TEXT",
             code: "fieldCode1changed",
             label: "Field Label 1 changed",
+          },
+          dropDownFieldCode: {
+            type: "DROP_DOWN",
+            options: {
+              選択肢1: {
+                index: "0",
+                label: "選択肢1",
+              },
+              選択肢2: {
+                index: "1",
+                label: "選択肢2",
+              },
+            },
           },
         } as PropertiesForParameter,
       });
