@@ -799,6 +799,21 @@ describe("MessageService", () => {
             code: "fieldCode2",
             label: "Field Label 2",
           },
+          dropDownFieldCode: {
+            type: "DROP_DOWN",
+            code: "dropDownFieldCode",
+            label: "Drop Down Field Label",
+            options: {
+              選択肢1: {
+                index: "0",
+                label: "選択肢1",
+              },
+              選択肢2: {
+                index: "1",
+                label: "選択肢2",
+              },
+            },
+          },
         } as PropertiesForParameter,
       });
       // 2回目の呼び出しで引数が正しいことを確認する
