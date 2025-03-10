@@ -685,6 +685,10 @@ describe("MessageService", () => {
             type: "SINGLE_LINE_TEXT",
             value: "Field Label 1",
           },
+          primaryKey: {
+            type: "SINGLE_LINE_TEXT",
+            value: "",
+          },
         } as Record,
         {
           appId: {
@@ -702,6 +706,10 @@ describe("MessageService", () => {
           label: {
             type: "SINGLE_LINE_TEXT",
             value: "Field Label 2",
+          },
+          primaryKey: {
+            type: "SINGLE_LINE_TEXT",
+            value: "",
           },
         } as Record,
         {
@@ -752,6 +760,10 @@ describe("MessageService", () => {
               },
             ],
           },
+          primaryKey: {
+            type: "SINGLE_LINE_TEXT",
+            value: "",
+          },
         } as Record,
         {
           appId: {
@@ -769,6 +781,32 @@ describe("MessageService", () => {
           label: {
             type: "SINGLE_LINE_TEXT",
             value: "Field Label 1",
+          },
+          primaryKey: {
+            type: "SINGLE_LINE_TEXT",
+            value: "",
+          },
+        } as Record,
+        {
+          appId: {
+            type: "SINGLE_LINE_TEXT",
+            value: "4",
+          },
+          type: {
+            type: "SINGLE_LINE_TEXT",
+            value: "SINGLE_LINE_TEXT",
+          },
+          fieldCode: {
+            type: "SINGLE_LINE_TEXT",
+            value: "fieldCode2",
+          },
+          label: {
+            type: "SINGLE_LINE_TEXT",
+            value: "Field Label 2",
+          },
+          primaryKey: {
+            type: "SINGLE_LINE_TEXT",
+            value: "4-fieldCode2",
           },
         } as Record,
       ];
@@ -863,7 +901,7 @@ describe("MessageService", () => {
           },
           type: {
             type: "SINGLE_LINE_TEXT",
-            value: "",
+            value: "SINGLE_LINE_TEXT",
           },
           fieldCode: {
             type: "SINGLE_LINE_TEXT",
@@ -889,7 +927,7 @@ describe("MessageService", () => {
           },
           type: {
             type: "SINGLE_LINE_TEXT",
-            value: "",
+            value: "SINGLE_LINE_TEXT",
           },
           fieldCode: {
             type: "SINGLE_LINE_TEXT",
@@ -915,7 +953,7 @@ describe("MessageService", () => {
           },
           type: {
             type: "SINGLE_LINE_TEXT",
-            value: "",
+            value: "SINGLE_LINE_TEXT",
           },
           fieldCode: {
             type: "SINGLE_LINE_TEXT",
@@ -941,7 +979,7 @@ describe("MessageService", () => {
           },
           type: {
             type: "SINGLE_LINE_TEXT",
-            value: "",
+            value: "SINGLE_LINE_TEXT",
           },
           fieldCode: {
             type: "SINGLE_LINE_TEXT",
@@ -975,14 +1013,16 @@ describe("MessageService", () => {
       });
 
       expect(mockkintoneSdk.updateFormFields).toHaveBeenCalledTimes(2);
-      // 1回目の呼び出しで引数が正しいことを確認する
+      // 1回目の呼び出しで引数が正しいことを確認する。typeは必須。
       expect(mockkintoneSdk.updateFormFields).toHaveBeenCalledWith({
         appId: "3",
         fields: {
           fieldCode1: {
+            type: "SINGLE_LINE_TEXT",
             label: "Field Label 1 changed",
           },
           fieldCode2: {
+            type: "SINGLE_LINE_TEXT",
             label: "Field Label 2 changed",
           },
         } as PropertiesForParameter,
@@ -992,6 +1032,7 @@ describe("MessageService", () => {
         appId: "4",
         fields: {
           fieldCode1: {
+            type: "SINGLE_LINE_TEXT",
             code: "fieldCode1changed",
             label: "Field Label 1 changed",
           },

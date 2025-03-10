@@ -151,6 +151,15 @@ export class ManagementConsoleService {
     const fieldsByAppId: { [key: string]: PropertiesForParameter } = {};
 
     records.records.forEach((record) => {
+      const primaryKey = record[
+        this.config.mappedGetFormFieldsResponse.primaryKey
+      ].value as string;
+
+      // primaryKeyがブランクの場合のみ追加対象とする
+      if (primaryKey) {
+        return;
+      }
+
       const appId = record.appId.value as string;
       if (!fieldsByAppId[appId]) {
         fieldsByAppId[appId] = {};
@@ -214,9 +223,11 @@ export class ManagementConsoleService {
       const fieldCode = record[
         this.config.mappedGetFormFieldsResponse.fieldCode
       ].value as string;
+      const type = record[this.config.mappedGetFormFieldsResponse.type]
+        .value as string;
 
-      // primaryKeyとfieldCodeが両方ある場合のみ更新対象とする
-      if (!primaryKey || !fieldCode) {
+      // primaryKey,fieldCode,typeの全てがある場合のみ更新対象とする
+      if (!primaryKey || !fieldCode || !type) {
         return;
       }
       if (!fieldsByAppId[appId]) {
@@ -229,6 +240,7 @@ export class ManagementConsoleService {
         .value as string;
 
       const field: any = {};
+      field.type = type;
       if (label) {
         field.label = label;
       }

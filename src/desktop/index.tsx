@@ -76,7 +76,7 @@ interface KintoneEvent {
     addFormFieldsButton.textContent = "フォームを更新";
     addFormFieldsButton.onclick = async () => {
       await managementConsoleService.addFormFieldsFromRecords();
-      await managementConsoleService.updateFormLayoutRecords();
+      await managementConsoleService.updateFormFieldsFromRecords();
       alert("フォームを更新しました");
     };
     headerMenuSpace.appendChild(addFormFieldsButton);
