@@ -68,7 +68,7 @@ interface KintoneEvent {
           `${resUpsertAppList}\n${resUpsertFormFields}\n${resUpsertFormLayouts}`,
         );
       },
-      `[${event.viewName}]のレコードを表示`,
+      `アプリ情報を更新`,
     );
 
     // 一旦DOM操作でheaderMenuSpaceにawait managementConsoleService.addFormFieldsFromRecords()を実行するボタンを追加する
