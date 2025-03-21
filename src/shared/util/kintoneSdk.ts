@@ -4,6 +4,7 @@ import {
 } from "@kintone/rest-api-client";
 
 import type {
+  App,
   AppID,
   Layout,
   Properties,
@@ -64,8 +65,29 @@ export class KintoneSdk {
       spaceIds?: number[];
     } = {},
   ) {
-    const apps = await this.restApiClient.app.getApps(params);
-    return apps;
+    const MAX_READ_LIMIT = 100; // Maximum allowed by the API
+
+    let allApps: App[] = [];
+    let offset = 0;
+
+    while (true) {
+      const response = await this.restApiClient.app.getApps({
+        ...params,
+        limit: MAX_READ_LIMIT,
+        offset: offset,
+      });
+
+      if (!response.apps || response.apps.length === 0) break;
+
+      allApps = allApps.concat(response.apps);
+
+      if (response.apps.length < MAX_READ_LIMIT) break;
+
+      offset += MAX_READ_LIMIT;
+    }
+
+    // Return the same structure as the original API response
+    return { apps: allApps };
   }
 
   public async getFormFields(params: { appId: AppID; preview?: boolean }) {
