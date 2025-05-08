@@ -1,6 +1,5 @@
 import {
   KintoneSdk,
-  type PropertiesForParameter,
   type RecordForParameter,
 } from "../../shared/util/kintoneSdk";
 
@@ -8,15 +7,11 @@ import type { ConfigSchema } from "../../shared/types/Config";
 import type {
   App,
   AppID,
-  Layout,
   Properties,
-  Record,
-  RecordID,
   Revision,
   UpdateKey,
   UpdateRecordsForResponse,
 } from "@kintone/rest-api-client/lib/src/client/types";
-import type { SingleLineText } from "@kintone/rest-api-client/lib/src/KintoneFields/types/field";
 
 export class ManagementConsoleService {
   private config: ConfigSchema;
@@ -141,207 +136,5 @@ export class ManagementConsoleService {
     });
 
     return recordsForUpdate;
-  }
-
-  public async addFormFieldsFromRecords(): Promise<void> {
-    const records = await this.kintoneSdk.getRecords({
-      appId: this.config.changeFormFieldApp.appId,
-    });
-
-    const fieldsByAppId: { [key: string]: PropertiesForParameter } = {};
-
-    records.records.forEach((record) => {
-      const primaryKey = record[
-        this.config.mappedGetFormFieldsResponse.primaryKey
-      ].value as string;
-
-      // primaryKeyがブランクの場合のみ追加対象とする
-      if (primaryKey) {
-        return;
-      }
-
-      const appId = record.appId.value as string;
-      if (!fieldsByAppId[appId]) {
-        fieldsByAppId[appId] = {};
-      }
-
-      const fieldCode = record[
-        this.config.mappedGetFormFieldsResponse.fieldCode
-      ].value as string;
-      const label = record[this.config.mappedGetFormFieldsResponse.label]
-        .value as string;
-      const type = record[this.config.mappedGetFormFieldsResponse.type]
-        .value as string;
-
-      const field: any = {
-        type,
-        code: fieldCode,
-        label,
-      };
-
-      if (type === "DROP_DOWN") {
-        const options = record[this.config.mappedGetFormFieldsResponse.options]
-          .value as Array<{ value: { [key: string]: { value: string } } }>;
-        field.options = options.reduce(
-          (acc, option) => {
-            const index =
-              option.value[this.config.mappedGetFormFieldsResponse.optionsIndex]
-                .value;
-            const optionLabel =
-              option.value[this.config.mappedGetFormFieldsResponse.optionsLabel]
-                .value;
-            acc[optionLabel] = { index, label: optionLabel };
-            return acc;
-          },
-          {} as { [key: string]: { index: string; label: string } },
-        );
-      }
-
-      fieldsByAppId[appId][fieldCode] = field;
-    });
-
-    for (const appId in fieldsByAppId) {
-      await this.kintoneSdk.addFormFields({
-        appId,
-        fields: fieldsByAppId[appId],
-      });
-    }
-  }
-
-  public async updateFormFieldsFromRecords(): Promise<void> {
-    const records = await this.kintoneSdk.getRecords({
-      appId: this.config.changeFormFieldApp.appId,
-    });
-
-    const fieldsByAppId: { [key: string]: PropertiesForParameter } = {};
-
-    records.records.forEach((record) => {
-      const appId = record.appId.value as string;
-      const primaryKey = record[
-        this.config.mappedGetFormFieldsResponse.primaryKey
-      ].value as string;
-      const fieldCode = record[
-        this.config.mappedGetFormFieldsResponse.fieldCode
-      ].value as string;
-      const type = record[this.config.mappedGetFormFieldsResponse.type]
-        .value as string;
-
-      // primaryKey,fieldCode,typeの全てがある場合のみ更新対象とする
-      if (!primaryKey || !fieldCode || !type) {
-        return;
-      }
-      if (!fieldsByAppId[appId]) {
-        fieldsByAppId[appId] = {};
-      }
-
-      const label = record[this.config.mappedGetFormFieldsResponse.label]
-        .value as string;
-      const code = record[this.config.mappedGetFormFieldsResponse.code]
-        .value as string;
-
-      const field: any = {};
-      field.type = type;
-      if (label) {
-        field.label = label;
-      }
-      if (code) {
-        field.code = code;
-      }
-
-      if (type === "DROP_DOWN") {
-        const options = record[this.config.mappedGetFormFieldsResponse.options]
-          .value as Array<{ value: { [key: string]: { value: string } } }>;
-        field.options = options.reduce(
-          (acc, option) => {
-            const index =
-              option.value[this.config.mappedGetFormFieldsResponse.optionsIndex]
-                .value;
-            const optionLabel =
-              option.value[this.config.mappedGetFormFieldsResponse.optionsLabel]
-                .value;
-            acc[optionLabel] = { index, label: optionLabel };
-            return acc;
-          },
-          {} as { [key: string]: { index: string; label: string } },
-        );
-      }
-
-      fieldsByAppId[appId][fieldCode] = field;
-    });
-
-    for (const appId in fieldsByAppId) {
-      await this.kintoneSdk.updateFormFields({
-        appId,
-        fields: fieldsByAppId[appId],
-      });
-    }
-  }
-
-  public async upsertFormLayoutList(
-    appIds: AppID[],
-  ): Promise<UpdateRecordsForResponse> {
-    // appIdsに対して、それぞれのアプリのフォームレイアウトを取得
-    const recordsForUpsertFormLayoutList = await Promise.all(
-      appIds.map(async (appId) => {
-        const formLayout = await this.kintoneSdk.getFormLayout({
-          appId: appId,
-        });
-        return this.makeRecordsForUpsertFormLayout(appId, formLayout);
-      }),
-    );
-    const recordsForUpsertFormLayout = recordsForUpsertFormLayoutList.flat();
-    const response = await this.kintoneSdk.updateAllRecords({
-      appId: this.config.FormLayout.appId,
-      upsert: true,
-      records: recordsForUpsertFormLayout,
-    });
-    return response.records;
-  }
-
-  public makeRecordsForUpsertFormLayout(
-    appId: AppID,
-    formLayout: {
-      layout: Layout;
-      revision: string;
-    },
-  ): Array<{
-    updateKey: UpdateKey;
-    record?: RecordForParameter;
-    revision?: Revision;
-  }> {
-    const recordsForUpdate: Array<{
-      updateKey: UpdateKey;
-      record?: RecordForParameter;
-      revision?: Revision;
-    }> = [
-      {
-        updateKey: {
-          field: this.config.mappedGetFormLayoutResponse.appId,
-          value: `${appId}`,
-        },
-        record: {
-          layout: { value: JSON.stringify(formLayout.layout) },
-        },
-      },
-    ];
-
-    return recordsForUpdate;
-  }
-
-  public async updateFormLayoutRecords(): Promise<void> {
-    const records = await this.kintoneSdk.getRecords({
-      appId: this.config.updateFormLayoutApp.appId,
-    });
-
-    records.records.forEach(async (record) => {
-      const appId = record.appId.value as string;
-      const layout = JSON.parse(
-        record[this.config.mappedGetFormLayoutResponse.layout].value as string,
-      ) as Layout;
-      await this.kintoneSdk.updateFormLayout({
-        app: appId,
-        layout: layout,
-      });
-    });
   }
 }
