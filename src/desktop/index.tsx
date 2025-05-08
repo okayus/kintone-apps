@@ -1,32 +1,12 @@
-import React from "react";
-import { createRoot } from "react-dom/client";
-
 import { KintoneRestAPIClient } from "@kintone/rest-api-client";
 
 import { KintoneSdk } from "../shared/util/kintoneSdk";
 
-import IndexShowButton from "./components/IndexShowButton";
+import { renderExecutionButton } from "./components/desktopUIHelpers";
 import { ManagementConsoleService } from "./service/ManagementConsoleService";
 
 import type { ConfigSchema } from "../shared/types/Config";
-import type { Record } from "@kintone/rest-api-client/lib/src/client/types";
-
-const renderButton = (
-  container: HTMLElement,
-  onClick: () => Promise<void>,
-  buttonLabel: string,
-) => {
-  createRoot(container).render(
-    <IndexShowButton onClick={onClick} buttonLabel={buttonLabel} />,
-  );
-};
-
-interface KintoneEvent {
-  appId: number;
-  record: Record;
-  viewId: number;
-  viewName: string;
-}
+import type { KintoneEvent } from "src/shared/types/KintoneTypes";
 
 // メイン処理
 ((PLUGIN_ID) => {
@@ -42,51 +22,22 @@ interface KintoneEvent {
       kintoneSdk,
     );
 
-    const headerMenuSpace = kintone.app.getHeaderMenuSpaceElement();
-    if (!headerMenuSpace) return;
-
-    const container = document.createElement("div");
-    headerMenuSpace.appendChild(container);
-
-    renderButton(
-      container,
-      async () => {
-        const upsertAppList = await managementConsoleService.upsertAppList(
+    const handleUpsertAppListtButtonClick = async () => {
+      try {
+        const appIds = await managementConsoleService.upsertAppList(
           event.appId,
         );
-        const resUpsertAppList = `managementConsoleServiceレコードを更新しました: ${upsertAppList.length}件`;
+        await managementConsoleService.upsertFormFieldList(appIds);
+      } catch (error) {
+        console.error("Error:", error);
+        throw error;
+      }
+    };
 
-        const upsertFormFields =
-          await managementConsoleService.upsertFormFieldList(upsertAppList);
-        const resUpsertFormFields = `managementConsoleServiceフォームを更新しました: ${upsertFormFields.length}件`;
-
-        const upsertFormLayouts =
-          await managementConsoleService.upsertFormLayoutList(upsertAppList);
-        const resUpsertFormLayouts = `managementConsoleServiceレイアウトを更新しました: ${upsertFormLayouts.length}件`;
-
-        alert(
-          `${resUpsertAppList}\n${resUpsertFormFields}\n${resUpsertFormLayouts}`,
-        );
-      },
-      `アプリ情報を更新`,
+    renderExecutionButton(
+      "alert-button",
+      handleUpsertAppListtButtonClick,
+      "アプリ一覧を更新",
     );
-
-    // 一旦DOM操作でheaderMenuSpaceにawait managementConsoleService.addFormFieldsFromRecords()を実行するボタンを追加する
-    const addFormFieldsButton = document.createElement("button");
-    addFormFieldsButton.textContent = "フォームを更新";
-    addFormFieldsButton.onclick = async () => {
-      await managementConsoleService.addFormFieldsFromRecords();
-      await managementConsoleService.updateFormFieldsFromRecords();
-      alert("フォームを更新しました");
-    };
-    headerMenuSpace.appendChild(addFormFieldsButton);
-
-    const updateFormLayoutButton = document.createElement("button");
-    updateFormLayoutButton.textContent = "レイアウトを更新";
-    updateFormLayoutButton.onclick = async () => {
-      await managementConsoleService.updateFormLayoutRecords();
-      alert("レイアウトを更新しました");
-    };
-    headerMenuSpace.appendChild(updateFormLayoutButton);
   });
 })(kintone.$PLUGIN_ID);

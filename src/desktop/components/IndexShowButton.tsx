@@ -3,12 +3,12 @@ import React, { useState } from "react";
 import { Button, Stack } from "@mui/material";
 import { Oval } from "react-loader-spinner";
 
-interface IndexShowButtonProps {
+interface ExecutionButtonProps {
   onClick: () => Promise<void>;
   buttonLabel?: string;
 }
 
-const IndexShowButton: React.FC<IndexShowButtonProps> = ({
+const ExecutionButton: React.FC<ExecutionButtonProps> = ({
   onClick,
   buttonLabel = "メッセージを表示",
 }) => {
@@ -18,9 +18,10 @@ const IndexShowButton: React.FC<IndexShowButtonProps> = ({
     setIsLoading(true);
     try {
       await onClick();
+      setIsLoading(false);
+      window.location.reload();
     } catch (error) {
       console.error("エラーが発生しました:", error);
-    } finally {
       setIsLoading(false);
     }
   };
@@ -51,4 +52,4 @@ const IndexShowButton: React.FC<IndexShowButtonProps> = ({
   );
 };
 
-export default IndexShowButton;
+export default ExecutionButton;
